@@ -37,13 +37,16 @@ class UI:
         canvas_frame = tk.Frame(pattern_window, bg="white", width=1000, height=600, bd=2, relief="solid")
         canvas_frame.pack(pady=10)
 
+        canvas = tk.Canvas(canvas_frame, width=1000, height=600, bg="white", highlightthickness=0)
+        canvas.pack()
+
         base_path = os.path.dirname(os.path.abspath(__file__))
         img_path = os.path.join(base_path, "..", "assets", "fond.png")  
 
         pil_image = Image.open(img_path).resize((1000, 600))
-        self.image = ImageTk.PhotoImage(pil_image)  
+        self.image = ImageTk.PhotoImage(pil_image) 
 
- 
+        canvas.create_image(0, 0, image=self.image, anchor="nw") 
 
 
     def run(self):

@@ -6,6 +6,7 @@ from matplotlib.collections import LineCollection
 import matplotlib.cm as cm
 
 class GazePosition:
+    
     def __init__(self, gaze_positions:list):
         self.gaze_positions = gaze_positions
 

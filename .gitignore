@@ -1,1 +1,4 @@
 venv
+userData
+__pycache__
+*.pyc
