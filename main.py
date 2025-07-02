@@ -1,10 +1,12 @@
 from eye_auth.tracker import EyeTracker
 from eye_auth.gaze_position import GazePosition
 from eye_auth.ui import UI
+from eye_auth.crypt import Crypt
 
 SURFACE_NAME = "Surface 1"
 
 def main():
+
 
     ui = UI()
     ui.run()
