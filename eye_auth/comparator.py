@@ -10,7 +10,7 @@ class Comparator:
         self.gaze1 = gaze1
         self.gaze2 = gaze2
 
-    def resample_path(path, n_points=100):
+    def resample_path(self, path, n_points=100):
         """
         Ré-échantillonne un chemin en n_points équidistants
         """
@@ -32,7 +32,7 @@ class Comparator:
             new_path.append(path[idx])
         return new_path
 
-    def to_similarity_percent(distance, max_threshold):
+    def to_similarity_percent(self, distance, max_threshold):
         """
         Transforme une distance en % de ressemblance (entre 0% et 100%)
         """

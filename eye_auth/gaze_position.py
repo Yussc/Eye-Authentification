@@ -15,17 +15,17 @@ class GazePosition:
         for pt in self.gaze_positions:
             if not deduped or np.linalg.norm(np.array(pt[:2]) - np.array(deduped[-1][:2])) > threshold:
                 deduped.append(pt)
-        return deduped
+        self.gaze_positions = deduped
     
-    def preprocess(self, threshold=0.002) -> list:
+    def preprocess(self, threshold=0.01) -> list:
         """
         Preprocess the gaze positions.
         """
 
         self.gaze_positions.sort(key=lambda pt: pt[2])
-        return self.deduplicate(threshold)
+        self.deduplicate(threshold)
     
-    def create_grid(n=3):
+    def create_grid(self, n=3):
         coords = np.linspace(0, 1, n+1)
         centers = (coords[:-1] + coords[1:]) / 2
         return centers, coords
@@ -75,6 +75,6 @@ class GazePosition:
         ax.grid(False)
         ax.legend()
 
-        filename = f"{image_path}/gaze_{int(time.time())}.png"
+        filename = f"{image_path}"
         plt.savefig(filename)
     

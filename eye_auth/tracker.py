@@ -11,6 +11,8 @@ class EyeTracker:
         self.pupil_remote = self.ctx.socket(zmq.REQ)
 
 
+
+
     def connect(self):
         """
         Connect to the eye tracker.
@@ -22,6 +24,8 @@ class EyeTracker:
             self.pupil_remote.connect(f"tcp://{self.ip}:{self.port}")
             self.pupil_remote.send_string('SUB_PORT')
             self.sub_port = self.pupil_remote.recv_string()
+            self.subscriber = self.ctx.socket(zmq.SUB)
+            self.subscriber.connect(f'tcp://{self.ip}:{self.sub_port}')
             self.connected = True
             print("Connected successfully.")
         except zmq.ZMQError as e:
@@ -53,9 +57,7 @@ class EyeTracker:
             return
         
         try:
-            self.subscriber = self.ctx.socket(zmq.SUB)
-            self.subscriber.connect(f'tcp://{self.ip}:{self.sub_port}')
-            self.subscriber.setsockopt_string(zmq.SUBSCRIBE, f'{topic}.')
+            self.subscriber.setsockopt_string(zmq.SUBSCRIBE, f'{topic}')
             print(f"Subscribed to {topic}")
         except zmq.ZMQError as e:
             print(f"Failed to subscribe to {topic}: {e}")
@@ -76,6 +78,7 @@ class EyeTracker:
             return
         
         recording = False
+        self.blink_start = None
         
         try:
             gaze_positions = []
@@ -83,8 +86,10 @@ class EyeTracker:
             while True:
                 topic, payload = self.subscriber.recv_multipart()
                 message = msgpack.loads(payload, raw=False)
+                print(topic)
 
-                if topic == b'surface' and recording:
+                if topic == b'surfaces.Surface 1' and recording:
+                    print("ok")
                     if message.get('name') != surface_name:
                         continue
 
@@ -94,14 +99,23 @@ class EyeTracker:
                             timestamp = gaze['timestamp']
                             gaze_positions.append((x, y, timestamp))
 
-                if topic == b'blink':
-                    duration = message.get('duration', 0)
-                    if duration >= 0.2:
-                        recording = not recording
-                        if(not recording):
-                            raise BlinkException()
-                    else:
-                        continue
+                
+
+                # Dans la callback :
+                if topic == b'blinks':
+                    blink_type = message.get('type')
+                    timestamp = message.get('timestamp')
+                    
+
+                    if blink_type == 'onset':
+                        self.blink_start = timestamp
+                    elif blink_type == 'offset' and self.blink_start is not None:
+                        blink_duration = timestamp - self.blink_start
+                        self.blink_start = None
+                        if blink_duration > 0.4:
+                            recording = not recording
+                            if(not recording):
+                                raise BlinkException()
 
         except BlinkException:
             return gaze_positions
