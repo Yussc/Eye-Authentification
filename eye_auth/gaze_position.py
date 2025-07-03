@@ -17,7 +17,7 @@ class GazePosition:
                 deduped.append(pt)
         self.gaze_positions = deduped
     
-    def preprocess(self, threshold=0.01) -> list:
+    def preprocess(self, threshold=0.002) -> list:
         """
         Preprocess the gaze positions.
         """
